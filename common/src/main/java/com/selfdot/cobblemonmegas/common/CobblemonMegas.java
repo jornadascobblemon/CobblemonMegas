@@ -22,6 +22,7 @@ import dev.architectury.event.events.common.PlayerEvent;
 import kotlin.Unit;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -105,10 +106,25 @@ public class CobblemonMegas extends DisableableMod {
         config.reload();
     }
 
+    private static final Identifier KEY_STONE = new Identifier("cobblemon", "key_stone");
     private Unit onBattleStartedPre(BattleStartedPreEvent event) {
         MegaUtils.deMegaEvolveAllPlayers(event.getBattle());
-        var players = event.getBattle().getPlayers();
-        players.forEach(player -> Cobblemon.playerData.get(player).getKeyItems().add(new Identifier("cobblemon", "key_stone")));
+        event.getBattle().getPlayers().forEach(
+            player -> {
+                boolean hasKeyStone = false;
+                Inventory inventory = player.getInventory();
+                for (int i = 0; i < inventory.size(); i++) {
+                    NbtCompound itemNbt = inventory.getStack(i).getOrCreateNbt();
+                    if (itemNbt.contains(DataKeys.NBT_KEY_KEY_STONE)) {
+                        hasKeyStone = true;
+                        break;
+                    }
+                }
+                Set<Identifier> keyItems = Cobblemon.playerData.get(player).getKeyItems();
+                if (hasKeyStone) keyItems.add(KEY_STONE);
+                else keyItems.remove(KEY_STONE);
+            }
+        );
         return Unit.INSTANCE;
     }
 
