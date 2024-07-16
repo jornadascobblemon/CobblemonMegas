@@ -59,3 +59,9 @@ tasks {
         }
     }
 }
+
+configurations.all {
+    resolutionStrategy {
+        force("net.fabricmc:fabric-loader:0.15.11")
+    }
+}

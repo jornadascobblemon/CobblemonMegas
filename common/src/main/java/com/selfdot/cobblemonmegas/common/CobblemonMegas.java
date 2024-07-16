@@ -1,5 +1,6 @@
 package com.selfdot.cobblemonmegas.common;
 
+import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.Priority;
 import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.api.events.battles.BattleStartedPreEvent;
@@ -25,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
 import java.util.List;
@@ -105,6 +107,8 @@ public class CobblemonMegas extends DisableableMod {
 
     private Unit onBattleStartedPre(BattleStartedPreEvent event) {
         MegaUtils.deMegaEvolveAllPlayers(event.getBattle());
+        var players = event.getBattle().getPlayers();
+        players.forEach(player -> Cobblemon.playerData.get(player).getKeyItems().add(new Identifier("cobblemon", "key_stone")));
         return Unit.INSTANCE;
     }
 
