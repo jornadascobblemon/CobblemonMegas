@@ -7,7 +7,6 @@
     "BattleActorMixin",
     "ItemMixin",
     "PokemonBattleMixin",
-    "ShowdownActionRequestMixin",
     "DetailsChangeInstructionMixin",
     "ShowdownSpeciesMixin"
   ],

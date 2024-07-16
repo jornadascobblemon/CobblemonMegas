@@ -23,96 +23,100 @@ import static com.selfdot.cobblemonmegas.common.command.permissions.MegasPermiss
 public class CommandTree {
 
     public static void register(
-        CommandDispatcher<ServerCommandSource> dispatcher,
-        CommandRegistryAccess commandRegistryAccess,
-        CommandManager.RegistrationEnvironment registrationEnvironment
+            CommandDispatcher<ServerCommandSource> dispatcher,
+            CommandRegistryAccess commandRegistryAccess,
+            CommandManager.RegistrationEnvironment registrationEnvironment
     ) {
         dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
-            literal("megas")
-            .requires(source -> CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, RELOAD))
-            .then(LiteralArgumentBuilder.<ServerCommandSource>
-                literal("reload")
-                .executes(new ReloadCommand())
-            )
-        );
-        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
-            literal("megaevolve")
-            .requires(source ->
-                !CobblemonMegas.getInstance().isDisabled() &&
-                source.isExecutedByPlayer() &&
-                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, MEGA_EVOLVE)
-            )
-            .executes(new MegaEvolveInBattleCommand())
-        );
-        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
-            literal("megaevolve")
-            .requires(source ->
-                !CobblemonMegas.getInstance().isDisabled() &&
-                source.isExecutedByPlayer() &&
-                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, MEGA_EVOLVE_SLOT)
-            )
-            .then(RequiredArgumentBuilder.<ServerCommandSource, Integer>
-                argument("pokemon", PartySlotArgumentType.Companion.partySlot())
-                .executes(new MegaEvolveSlotCommand())
-            )
-        );
-        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
-            literal("getmegastone")
-            .requires(source ->
-                !CobblemonMegas.getInstance().isDisabled() &&
-                source.isExecutedByPlayer() &&
-                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, GET_MEGA_STONE)
-            )
-            .then(RequiredArgumentBuilder.<ServerCommandSource, String>
-                argument("megaStone", string())
-                .suggests(CommandTree::megaStoneIDSuggestions)
-                .executes(new GetMegaStoneCommand())
-            )
-        );
-        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
-            literal("givemegastone")
-            .requires(source ->
-                !CobblemonMegas.getInstance().isDisabled() &&
-                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, GIVE_MEGA_STONE)
-            )
-            .then(RequiredArgumentBuilder.<ServerCommandSource, String>
-                argument("megaStone", string())
-                .suggests(CommandTree::megaStoneIDSuggestions)
-                .then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>
-                    argument("players", EntityArgumentType.players())
-                    .executes(new GiveMegaStoneCommand())
+                        literal("megas")
+                .requires(source -> CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, RELOAD))
+                .then(LiteralArgumentBuilder.<ServerCommandSource>
+                                literal("reload")
+                        .executes(new ReloadCommand())
                 )
-            )
         );
         dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
-            literal("givekeystone")
-            .requires(source ->
-                !CobblemonMegas.getInstance().isDisabled() &&
-                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, GIVE_KEY_STONE)
-            )
-            .then(RequiredArgumentBuilder.<ServerCommandSource, String>
-                argument("keyStone", string())
-                .suggests((context, builder) -> {
-                    GiveKeyStoneCommand.KEY_STONE_TYPES.keySet().forEach(builder::suggest);
-                    return builder.buildFuture();
-                })
-                .then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>
-                    argument("players", EntityArgumentType.players())
-                    .executes(new GiveKeyStoneCommand())
+                        literal("megaevolve")
+                .requires(source ->
+                        !CobblemonMegas.getInstance().isDisabled() &&
+                                source.isExecutedByPlayer() &&
+                                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, MEGA_EVOLVE)
                 )
-            )
+                .executes(new MegaEvolveInBattleCommand())
         );
+        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
+                        literal("megaevolve")
+                .requires(source ->
+                        !CobblemonMegas.getInstance().isDisabled() &&
+                                source.isExecutedByPlayer() &&
+                                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, MEGA_EVOLVE_SLOT)
+                )
+                .then(RequiredArgumentBuilder.<ServerCommandSource, Integer>
+                                argument("pokemon", PartySlotArgumentType.Companion.partySlot())
+                        .executes(new MegaEvolveSlotCommand())
+                )
+        );
+        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
+                        literal("getmegastone")
+                .requires(source ->
+                        !CobblemonMegas.getInstance().isDisabled() &&
+                                source.isExecutedByPlayer() &&
+                                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, GET_MEGA_STONE)
+                )
+                .then(RequiredArgumentBuilder.<ServerCommandSource, String>
+                                argument("megaStone", string())
+                        .suggests(CommandTree::megaStoneIDSuggestions)
+                        .executes(new GetMegaStoneCommand())
+                )
+        );
+        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
+                        literal("givemegastone")
+                .requires(source ->
+                        !CobblemonMegas.getInstance().isDisabled() &&
+                                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, GIVE_MEGA_STONE)
+                )
+                .then(RequiredArgumentBuilder.<ServerCommandSource, String>
+                                argument("megaStone", string())
+                        .suggests(CommandTree::megaStoneIDSuggestions)
+                        .then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>
+                                        argument("players", EntityArgumentType.players())
+                                .executes(new GiveMegaStoneCommand())
+                        )
+                )
+        );
+        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
+                        literal("givekeystone")
+                .requires(source ->
+                        !CobblemonMegas.getInstance().isDisabled() &&
+                                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, GIVE_KEY_STONE)
+                )
+                .then(RequiredArgumentBuilder.<ServerCommandSource, String>
+                                argument("keyStone", string())
+                        .suggests((context, builder) -> {
+                            GiveKeyStoneCommand.KEY_STONE_TYPES.keySet().forEach(builder::suggest);
+                            return builder.buildFuture();
+                        })
+                        .then(RequiredArgumentBuilder.<ServerCommandSource, EntitySelector>
+                                        argument("players", EntityArgumentType.players())
+                                .executes(new GiveKeyStoneCommand())
+                        )
+                )
+        );
+        dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
+                        literal("migratestone")
+                .requires(source -> !CobblemonMegas.getInstance().isDisabled())
+                .executes(new MigrateMegaStone()));
     }
 
     private static CompletableFuture<Suggestions> megaStoneIDSuggestions(
-        CommandContext<ServerCommandSource> context,
-        SuggestionsBuilder builder
+            CommandContext<ServerCommandSource> context,
+            SuggestionsBuilder builder
     ) {
         MegaStoneHeldItemManager.getInstance().getAllMegaStoneIds().stream()
-            .filter(id ->
-                CobblemonMegas.getInstance().getConfig().getMegaStoneWhitelist().contains(id)
-            )
-            .forEach(builder::suggest);
+                .filter(id ->
+                        CobblemonMegas.getInstance().getConfig().getMegaStoneWhitelist().contains(id)
+                )
+                .forEach(builder::suggest);
         return builder.buildFuture();
     }
 
