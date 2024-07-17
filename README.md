@@ -34,6 +34,9 @@ Commands:
 **/megas reload** (Permission: "selfdot.megas.reload")
 - Reloads config file.
 ---
+**/migratestone**
+- If the player is holding a mega stone from AaronMusk's raid mod, converts it into a mega stone for this mod.
+---
 
 Config (Located at "config/cobblemonmegas/config.json"):
 

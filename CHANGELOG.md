@@ -1,3 +1,8 @@
+# 1.3.0
+- Made key stones required for mega evolving in battle.
+- Added /migratestone command to migrate mega stones from AaronMusk's mega mod.
+- Fixed compatibility with other gimmick mods.
+
 # 1.2.0
 - Added mega evolve button in battle GUI (still only requires mod on server-side)
 

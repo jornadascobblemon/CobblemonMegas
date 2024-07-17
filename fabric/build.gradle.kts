@@ -34,7 +34,7 @@ dependencies {
         isTransitive = false
     }
 
-    modImplementation("com.cobblemon:fabric:${rootProject.property("cobblemon_version")}")
+    modImplementation("com.cobblemon:fabric:${rootProject.property("cobblemon_version")}+${rootProject.property("mc_version")}")
 
     modImplementation(libs.fabricLoader)
     modApi(libs.fabricApi)
