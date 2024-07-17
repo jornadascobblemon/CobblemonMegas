@@ -14,11 +14,11 @@ import thedarkcolour.kotlinforforge.KotlinModLoadingContext
 class CobblemonMegasForge {
     init {
         val modEventBus = KotlinModLoadingContext.get().getKEventBus()
-        modEventBus.addListener { event: FMLCommonSetupEvent -> commonSetup(event) }
+        modEventBus.addListener { _: FMLCommonSetupEvent -> commonSetup() }
         MinecraftForge.EVENT_BUS.register(this)
     }
 
-    private fun commonSetup(event: FMLCommonSetupEvent) {
+    private fun commonSetup() {
         CobblemonMegas.getInstance().onInitialize()
         DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER) { SetPermissionValidatorRunnable() }
     }
