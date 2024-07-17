@@ -21,7 +21,7 @@ import java.util.List;
 @Mixin(DetailsChangeInstruction.class)
 public abstract class DetailsChangeInstructionMixin {
 
-    @Shadow
+    @Shadow(remap = false)
     public abstract BattleMessage getMessage();
 
     @Inject(method = "invoke", at = @At("TAIL"), remap = false)

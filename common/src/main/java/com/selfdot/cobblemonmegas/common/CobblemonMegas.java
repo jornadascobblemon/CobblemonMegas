@@ -20,6 +20,9 @@ import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import kotlin.Unit;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 public class CobblemonMegas extends DisableableMod {
 
     private static final CobblemonMegas INSTANCE = new CobblemonMegas();
@@ -42,16 +46,16 @@ public class CobblemonMegas extends DisableableMod {
         return INSTANCE;
     }
 
+    @Getter
     private MinecraftServer server;
+    @Getter
+    @Setter
     private PermissionValidator permissionValidator = new VanillaPermissionValidator();
     private final Set<UUID> TO_MEGA_EVOLVE_THIS_TURN = new HashSet<>();
     private final Set<UUID> HAS_MEGA_EVOLVED_THIS_BATTLE = new HashSet<>();
 
+    @Getter
     private Config config;
-
-    public MinecraftServer getServer() {
-        return server;
-    }
 
     public Set<UUID> getToMegaEvolveThisTurn() {
         return TO_MEGA_EVOLVE_THIS_TURN;
@@ -59,18 +63,6 @@ public class CobblemonMegas extends DisableableMod {
 
     public Set<UUID> getHasMegaEvolvedThisBattle() {
         return HAS_MEGA_EVOLVED_THIS_BATTLE;
-    }
-
-    public PermissionValidator getPermissionValidator() {
-        return permissionValidator;
-    }
-
-    public void setPermissionValidator(PermissionValidator permissionValidator) {
-        this.permissionValidator = permissionValidator;
-    }
-
-    public Config getConfig() {
-        return config;
     }
 
     public void onInitialize() {
@@ -111,18 +103,14 @@ public class CobblemonMegas extends DisableableMod {
         MegaUtils.deMegaEvolveAllPlayers(event.getBattle());
         event.getBattle().getPlayers().forEach(
             player -> {
-                boolean hasKeyStone = false;
-                Inventory inventory = player.getInventory();
-                for (int i = 0; i < inventory.size(); i++) {
-                    NbtCompound itemNbt = inventory.getStack(i).getOrCreateNbt();
-                    if (itemNbt.contains(DataKeys.NBT_KEY_KEY_STONE)) {
-                        hasKeyStone = true;
-                        break;
-                    }
-                }
                 Set<Identifier> keyItems = Cobblemon.playerData.get(player).getKeyItems();
-                if (hasKeyStone) keyItems.add(KEY_STONE);
-                else keyItems.remove(KEY_STONE);
+                if (player.getInventory().containsAny(
+                    itemStack -> !itemStack.isEmpty() && itemStack.getOrCreateNbt().contains(DataKeys.NBT_KEY_KEY_STONE)
+                )) {
+                    keyItems.add(KEY_STONE);
+                } else {
+                    keyItems.remove(KEY_STONE);
+                }
             }
         );
         return Unit.INSTANCE;
