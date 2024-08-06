@@ -23,9 +23,12 @@ public class MegasPermissions {
     public static final Permission GIVE_KEY_STONE = new Permission(
         MEGAS + "givekeystone", CHEAT_COMMANDS_AND_COMMAND_BLOCKS
     );
+    public static final Permission MIGRATE_STONE = new Permission(
+            MEGAS + "migratestone", CHEAT_COMMANDS_AND_COMMAND_BLOCKS
+    );
 
     public static List<Permission> all() {
-        return List.of(RELOAD, MEGA_EVOLVE, MEGA_EVOLVE_SLOT, GET_MEGA_STONE, GIVE_MEGA_STONE, GIVE_KEY_STONE);
+        return List.of(RELOAD, MEGA_EVOLVE, MEGA_EVOLVE_SLOT, GET_MEGA_STONE, GIVE_MEGA_STONE, GIVE_KEY_STONE, MIGRATE_STONE);
     }
 
 }

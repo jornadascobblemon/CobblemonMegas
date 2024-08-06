@@ -104,7 +104,9 @@ public class CommandTree {
         );
         dispatcher.register(LiteralArgumentBuilder.<ServerCommandSource>
                         literal("migratestone")
-                .requires(source -> !CobblemonMegas.getInstance().isDisabled())
+                .requires(source ->
+                        !CobblemonMegas.getInstance().isDisabled() &&
+                                CobblemonMegas.getInstance().getPermissionValidator().hasPermission(source, MIGRATE_STONE))
                 .executes(new MigrateMegaStone()));
     }
 
