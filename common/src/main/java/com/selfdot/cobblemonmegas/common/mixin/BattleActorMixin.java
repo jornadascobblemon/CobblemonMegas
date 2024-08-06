@@ -22,12 +22,12 @@ import java.util.UUID;
 @Mixin(BattleActor.class)
 public abstract class BattleActorMixin {
 
-    @Shadow public abstract UUID getUuid();
-    @Shadow public abstract Iterable<UUID> getPlayerUUIDs();
+    @Shadow(remap = false) public abstract UUID getUuid();
+    @Shadow(remap = false) public abstract Iterable<UUID> getPlayerUUIDs();
 
-    @Shadow private List<ShowdownActionResponse> responses;
+    @Shadow(remap = false) private List<ShowdownActionResponse> responses;
 
-    @Shadow @Final private List<ActiveBattlePokemon> activePokemon;
+    @Shadow(remap = false) @Final private List<ActiveBattlePokemon> activePokemon;
 
     @Inject(method = "writeShowdownResponse", at = @At("HEAD"), remap = false)
     private void injectWriteShowdownResponse(CallbackInfo ci) {
