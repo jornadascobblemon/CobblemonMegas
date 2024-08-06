@@ -16,6 +16,8 @@ public class MigrateMegaStone implements Command<ServerCommandSource> {
         var player = context.getSource().getPlayerOrThrow();
 
         var handStack = player.getMainHandStack();
+        // You would think an empty hand would not retain NBT from the last held item, right? WRONG!
+        if (handStack.isEmpty()) return error(player, "Hand does not contain valid or old mega stone");
         if (handStack.getNbt() == null) return error(player, "Hand does not contain valid or old mega stone");
         if (!handStack.getOrCreateNbt().contains("ShowdownID")) return error(player, "Hand does not contain valid or old mega stone");
         var showdownId = handStack.getOrCreateNbt().getString("ShowdownID");
