@@ -41,6 +41,7 @@ public abstract class DetailsChangeInstructionMixin {
                 String megaType = DataKeys.MEGA;
                 if      (megaStone.endsWith("x")) megaType = DataKeys.MEGA_X;
                 else if (megaStone.endsWith("y")) megaType = DataKeys.MEGA_Y;
+                else if (megaStone.endsWith("orb")) megaType = DataKeys.PRIMAL;
                 new FlagSpeciesFeature(megaType, true).apply(battlePokemon.getOriginalPokemon());
                 new FlagSpeciesFeature(megaType, true).apply(battlePokemon.getEffectedPokemon());
                 ServerPlayerEntity player = battlePokemon.getOriginalPokemon().getOwnerPlayer();
