@@ -36,7 +36,7 @@ public class MegaUtils {
         }
 
         if (!MegaStoneHeldItemManager.getInstance().isHoldingValidMegaStone(pokemon)) {
-            return "This Pokémon is not holding its Mega Stone or orb";
+            return "This Pokémon is not holding its Mega Stone or orb.";
         }
 
         if (pokemon.getSpecies().getName().equalsIgnoreCase("rayquaza")) {

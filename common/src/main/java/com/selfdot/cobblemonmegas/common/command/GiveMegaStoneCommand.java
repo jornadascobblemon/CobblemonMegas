@@ -17,19 +17,9 @@ public class GiveMegaStoneCommand implements Command<ServerCommandSource> {
     public int run(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         Collection<ServerPlayerEntity> players = EntityArgumentType.getPlayers(context, "players");
         if (players == null) return 0;
-
-        String megaStone = StringArgumentType.getString(context, "megaStone").toLowerCase();
-
-        ItemStack itemStack;
-
-//        if (megaStone.equals("redorb")) {
-//            itemStack = MegaStoneHeldItemManager.getInstance().getRedOrbItem();
-//        } else if (megaStone.equals("blueorb")) {
-//            itemStack = MegaStoneHeldItemManager.getInstance().getBlueOrbItem();
-//        } else {
-        itemStack = MegaStoneHeldItemManager.getInstance().getMegaStoneItem(megaStone);
-
-        players.forEach(player -> player.giveItemStack(itemStack));
+        players.forEach(player -> player.giveItemStack(MegaStoneHeldItemManager.getInstance().getMegaStoneItem(
+                StringArgumentType.getString(context, "megaStone")
+        )));
 
         return SINGLE_SUCCESS;
     }

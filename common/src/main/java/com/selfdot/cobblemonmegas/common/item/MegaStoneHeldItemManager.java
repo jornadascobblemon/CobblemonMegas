@@ -34,8 +34,8 @@ public class MegaStoneHeldItemManager implements HeldItemManager {
         if (!CobblemonMegas.getInstance().getConfig().getMegaStoneWhitelist().contains(id)) {
             return ItemStack.EMPTY;
         }
-        ItemStack item = new ItemStack(Items.EMERALD);
-        NbtCompound nbt = item.getOrCreateNbt();
+        ItemStack megaStone = new ItemStack(Items.EMERALD);
+        NbtCompound nbt = megaStone.getOrCreateNbt();
         nbt.putString(DataKeys.NBT_KEY_MEGA_STONE, id);
         nbt.putInt("CustomModelData", customModelData(id));
         nbt.putBoolean("italic", false);
@@ -44,28 +44,8 @@ public class MegaStoneHeldItemManager implements HeldItemManager {
             displayName = displayName.substring(0, id.length() - 1) +
                     displayName.substring(id.length() - 1).toUpperCase();
         }
-        ItemUtils.setNameNoItalics(item, displayName);
-        return item;
-    }
-
-    public ItemStack getRedOrbItem() {
-        ItemStack redOrb = new ItemStack(Items.EMERALD);
-        NbtCompound nbt = redOrb.getOrCreateNbt();
-        nbt.putString(DataKeys.NBT_KEY_MEGA_STONE, "redorb");
-        nbt.putInt("CustomModelData", customModelData("redorb"));
-        nbt.putBoolean("italic", false);
-        ItemUtils.setNameNoItalics(redOrb, "Red Orb");
-        return redOrb;
-    }
-
-    public ItemStack getBlueOrbItem() {
-        ItemStack blueOrb = new ItemStack(Items.EMERALD);
-        NbtCompound nbt = blueOrb.getOrCreateNbt();
-        nbt.putString(DataKeys.NBT_KEY_MEGA_STONE, "blueorb");
-        nbt.putInt("CustomModelData", customModelData("blueorb"));
-        nbt.putBoolean("italic", false);
-        ItemUtils.setNameNoItalics(blueOrb, "Blue Orb");
-        return blueOrb;
+        ItemUtils.setNameNoItalics(megaStone, displayName);
+        return megaStone;
     }
 
     @Override
@@ -75,16 +55,16 @@ public class MegaStoneHeldItemManager implements HeldItemManager {
 
     @Override
     public void handleEndInstruction(
-            @NotNull BattlePokemon battlePokemon,
-            @NotNull PokemonBattle pokemonBattle,
-            @NotNull BattleMessage battleMessage
+        @NotNull BattlePokemon battlePokemon,
+        @NotNull PokemonBattle pokemonBattle,
+        @NotNull BattleMessage battleMessage
     ) { }
 
     @Override
     public void handleStartInstruction(
-            @NotNull BattlePokemon battlePokemon,
-            @NotNull PokemonBattle pokemonBattle,
-            @NotNull BattleMessage battleMessage
+        @NotNull BattlePokemon battlePokemon,
+        @NotNull PokemonBattle pokemonBattle,
+        @NotNull BattleMessage battleMessage
     ) { }
 
     @NotNull
@@ -95,9 +75,9 @@ public class MegaStoneHeldItemManager implements HeldItemManager {
 
     @Override
     public boolean shouldConsumeItem(
-            @NotNull BattlePokemon battlePokemon,
-            @NotNull PokemonBattle pokemonBattle,
-            @NotNull String s
+        @NotNull BattlePokemon battlePokemon,
+        @NotNull PokemonBattle pokemonBattle,
+        @NotNull String s
     ) {
         return false;
     }
@@ -128,12 +108,12 @@ public class MegaStoneHeldItemManager implements HeldItemManager {
     }
 
     public boolean isHoldingValidMegaStone(Pokemon pokemon) {
-        String speciesName = pokemon.getSpecies().getName();
-        if (speciesName.equalsIgnoreCase("rayquaza")) return true;
+        Species species = pokemon.getSpecies();
+        if (species.getName().equalsIgnoreCase("rayquaza")) return true;
 
         String showdownId = showdownId(pokemon);
         if (showdownId == null) return false;
-        return MEGA_STONE_IDS.get(showdownId).equals(pokemon.getSpecies());
+        return MEGA_STONE_IDS.get(showdownId).equals(species);
     }
 
     public Set<String> getAllMegaStoneIds() {

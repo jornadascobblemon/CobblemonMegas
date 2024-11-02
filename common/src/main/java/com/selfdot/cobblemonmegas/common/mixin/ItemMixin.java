@@ -20,7 +20,7 @@ public abstract class ItemMixin {
 
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     private void injectUse(
-            World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir
+        World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<TypedActionResult<ItemStack>> cir
     ) {
         if (!(user instanceof ServerPlayerEntity player)) return;
         ItemStack itemStack = player.getStackInHand(hand);
@@ -28,11 +28,6 @@ public abstract class ItemMixin {
         if (nbt == null || !nbt.getBoolean(DataKeys.NBT_KEY_KEY_STONE)) return;
         MegaUtils.attemptMegaEvolveInBattle(player, false);
         cir.setReturnValue(TypedActionResult.consume(itemStack));
-    }
-
-    private TypedActionResult<ItemStack> onUse(Item item, World world, PlayerEntity user, Hand hand) {
-
-        return item.use(world, user, hand);
     }
 }
 

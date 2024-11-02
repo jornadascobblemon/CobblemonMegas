@@ -27,7 +27,7 @@ public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
 
         Pokemon pokemon = PartySlotArgumentType.Companion.getPokemon(context, "pokemon");
 
-        if (Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
+        if (Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y, DataKeys.PRIMAL)
             .anyMatch(aspect -> pokemon.getAspects().contains(aspect))
         ) {
             MegaUtils.deMegaEvolve(pokemon);
@@ -49,6 +49,16 @@ public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
             if (nbtCompound == null) return 0;
             megaType = nbtCompound.getString(DataKeys.NBT_KEY_MEGA_STONE).endsWith("x") ?
                 DataKeys.MEGA_X : DataKeys.MEGA_Y;
+        }
+
+        if (
+            pokemon.getSpecies().getName().equalsIgnoreCase("kyogre") ||
+                pokemon.getSpecies().getName().equalsIgnoreCase("groudon")
+        ) {
+            NbtCompound nbtCompound = pokemon.heldItem().getNbt();
+            if (nbtCompound == null) return 0;
+            megaType = nbtCompound.getString(DataKeys.NBT_KEY_MEGA_STONE).endsWith("orb") ?
+                DataKeys.PRIMAL : megaType;
         }
 
         PokemonBattle battle = BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player);
