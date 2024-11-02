@@ -29,14 +29,14 @@ public class MegaUtils {
 
     public static String reasonCannotMegaEvolve(ServerPlayerEntity player, Pokemon pokemon) {
         if (
-            Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
+            Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y, DataKeys.PRIMAL)
                 .noneMatch(aspect -> pokemon.getSpecies().getFeatures().contains(aspect))
         ) {
-            return "This species cannot mega evolve.";
+            return "“This species cannot megaevolve and has no primal form.”";
         }
 
         if (!MegaStoneHeldItemManager.getInstance().isHoldingValidMegaStone(pokemon)) {
-            return "This Pokémon is not holding their Mega Stone.";
+            return "This Pokémon is not holding its Mega Stone or orb";
         }
 
         if (pokemon.getSpecies().getName().equalsIgnoreCase("rayquaza")) {
@@ -87,7 +87,7 @@ public class MegaUtils {
     }
 
     public static void deMegaEvolve(Pokemon pokemon) {
-        Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
+        Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y, DataKeys.PRIMAL)
             .forEach(megaAspect -> new FlagSpeciesFeature(megaAspect, false).apply(pokemon));
     }
 

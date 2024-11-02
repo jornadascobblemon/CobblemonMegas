@@ -3,6 +3,7 @@ package com.selfdot.cobblemonmegas.common;
 public class DataKeys {
 
     public static final String MOD_NAMESPACE = "cobblemonmegas";
+    public static final String PRIMAL = "primal";
     public static final String MEGA = "mega";
     public static final String MEGA_X = "mega-x";
     public static final String MEGA_Y = "mega-y";

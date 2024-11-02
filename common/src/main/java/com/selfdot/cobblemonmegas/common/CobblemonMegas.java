@@ -85,10 +85,15 @@ public class CobblemonMegas extends DisableableMod {
         registerAspectProvider(DataKeys.MEGA);
         registerAspectProvider(DataKeys.MEGA_X);
         registerAspectProvider(DataKeys.MEGA_Y);
+        registerAspectProvider(DataKeys.PRIMAL);
         for (Species species : PokemonSpecies.INSTANCE.getSpecies()) {
             if (species.getForms().stream().anyMatch(form -> form.getName().equalsIgnoreCase(DataKeys.MEGA))) {
                 species.getFeatures().add(DataKeys.MEGA);
-            } else if (species.getForms().stream().anyMatch(form -> form.getName().equalsIgnoreCase(DataKeys.MEGA_X))) {
+            }
+            if (species.getForms().stream().anyMatch(form -> form.getName().equalsIgnoreCase(DataKeys.PRIMAL))) {
+                species.getFeatures().add(DataKeys.PRIMAL);
+            }
+            if (species.getForms().stream().anyMatch(form -> form.getName().equalsIgnoreCase(DataKeys.MEGA_X))) {
                 species.getFeatures().add(DataKeys.MEGA_X);
                 species.getFeatures().add(DataKeys.MEGA_Y);
             }
