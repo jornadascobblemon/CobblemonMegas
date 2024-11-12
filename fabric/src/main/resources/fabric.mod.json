@@ -5,10 +5,11 @@
   "name": "CobblemonMegas",
   "description": "",
   "authors": [
-    "selfdot"
+    "selfdot",
+    "1mamute"
   ],
   "contact": {
-    "repo": "https://github.com/davo899/CobblemonMegas"
+    "repo": "https://github.com/jornadacobblemon/CobblemonMegas"
   },
   "environment": "*",
   "entrypoints": {
