@@ -1,3 +1,6 @@
+# 1.3.2
+- Fixed abilities being set incorrectly after mega evolving.
+
 # 1.3.0
 - Made key stones required for mega evolving in battle.
 - Added /migratestone command to migrate mega stones from AaronMusk's mega mod.

@@ -2,6 +2,7 @@ package com.selfdot.cobblemonmegas.common;
 
 import com.cobblemon.mod.common.Cobblemon;
 import com.cobblemon.mod.common.api.Priority;
+import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.api.events.battles.BattleStartedPreEvent;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
@@ -36,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class CobblemonMegas extends DisableableMod {
@@ -53,6 +55,8 @@ public class CobblemonMegas extends DisableableMod {
     private PermissionValidator permissionValidator = new VanillaPermissionValidator();
     private final Set<UUID> TO_MEGA_EVOLVE_THIS_TURN = new HashSet<>();
     private final Set<UUID> HAS_MEGA_EVOLVED_THIS_BATTLE = new HashSet<>();
+    @Getter
+    private final ConcurrentHashMap<UUID, Ability> originalAbilities = new ConcurrentHashMap<>();
 
     @Getter
     private Config config;

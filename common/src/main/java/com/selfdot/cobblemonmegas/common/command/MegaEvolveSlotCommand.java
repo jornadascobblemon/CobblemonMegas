@@ -1,5 +1,6 @@
 package com.selfdot.cobblemonmegas.common.command;
 
+import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor;
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
@@ -16,6 +17,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
@@ -53,6 +56,10 @@ public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
 
         PokemonBattle battle = BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player);
         if (battle == null) {
+            // Save the original ability to restore it later
+            ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
+            originalAbilities.put(pokemon.getUuid(), pokemon.getAbility());
+
             new FlagSpeciesFeature(megaType, true).apply(pokemon);
         } else {
             BattleActor battleActor = battle.getActor(player);
