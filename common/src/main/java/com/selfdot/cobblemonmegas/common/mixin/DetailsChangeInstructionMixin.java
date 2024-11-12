@@ -1,10 +1,12 @@
 package com.selfdot.cobblemonmegas.common.mixin;
 
+import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
 import com.cobblemon.mod.common.battles.interpreter.instructions.DetailsChangeInstruction;
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon;
+import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.selfdot.cobblemonmegas.common.CobblemonMegas;
 import com.selfdot.cobblemonmegas.common.DataKeys;
 import com.selfdot.cobblemonmegas.common.util.MegaUtils;
@@ -16,7 +18,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mixin(DetailsChangeInstruction.class)
 public abstract class DetailsChangeInstructionMixin {
@@ -41,8 +44,15 @@ public abstract class DetailsChangeInstructionMixin {
                 String megaType = DataKeys.MEGA;
                 if      (megaStone.endsWith("x")) megaType = DataKeys.MEGA_X;
                 else if (megaStone.endsWith("y")) megaType = DataKeys.MEGA_Y;
-                new FlagSpeciesFeature(megaType, true).apply(battlePokemon.getOriginalPokemon());
-                new FlagSpeciesFeature(megaType, true).apply(battlePokemon.getEffectedPokemon());
+                Pokemon originalPokemon = battlePokemon.getOriginalPokemon();
+                Pokemon effectedPokemon = battlePokemon.getEffectedPokemon();
+
+                // Save the original ability to restore it later
+                ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
+                originalAbilities.put(originalPokemon.getUuid(), originalPokemon.getAbility());
+
+                new FlagSpeciesFeature(megaType, true).apply(originalPokemon);
+                new FlagSpeciesFeature(megaType, true).apply(effectedPokemon);
                 ServerPlayerEntity player = battlePokemon.getOriginalPokemon().getOwnerPlayer();
                 if (player == null) return Unit.INSTANCE;
                 CobblemonMegas.getInstance().getHasMegaEvolvedThisBattle().add(player.getUuid());

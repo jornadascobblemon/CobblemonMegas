@@ -1,5 +1,6 @@
 package com.selfdot.cobblemonmegas.common.util;
 
+import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor;
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
@@ -22,6 +23,7 @@ import net.minecraft.util.Formatting;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -88,7 +90,17 @@ public class MegaUtils {
 
     public static void deMegaEvolve(Pokemon pokemon) {
         Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
-            .forEach(megaAspect -> new FlagSpeciesFeature(megaAspect, false).apply(pokemon));
+            .forEach(megaAspect ->
+                    new FlagSpeciesFeature(megaAspect, false).apply(pokemon)
+            );
+
+        // If it mega evolved, restore the original ability and remove it from the map
+        ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
+        Ability originalAbility = originalAbilities.get(pokemon.getUuid());
+        if (originalAbility != null) {
+            pokemon.updateAbility(originalAbility);
+            originalAbilities.remove(pokemon.getUuid());
+        }
     }
 
     private static void sendError(ServerPlayerEntity player, String error) {
@@ -154,6 +166,10 @@ public class MegaUtils {
                 pokemon.getDisplayName().getString() + " will mega evolve this turn if a move is used."
             ));
         }
+
+        // Save the original ability to restore it later
+        ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
+        originalAbilities.put(pokemon.getUuid(), pokemon.getAbility());
         return true;
     }
 
