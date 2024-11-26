@@ -6,19 +6,19 @@ plugins {
     id("idea")
     kotlin("jvm") version "2.0.21"
 
-    id("dev.architectury.loom") version "1.6-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
     id("architectury-plugin") version "3.4-SNAPSHOT"
 }
 
-val fullVersion = "${project.property("mod_version")}+${project.property("cobblemon_version")}"
+var fullVersionName = "${project.property("mod_version")}+${project.property("cobblemon_version")}"
 val isSnapshot: Boolean = (property("snapshot")?.toString() == "true")
 if (isSnapshot) {
-    version = "$version-SNAPSHOT"
+    fullVersionName = "$fullVersionName-SNAPSHOT"
 }
 
 allprojects {
     group = "com.selfdot.cobblemonmegas"
-    version = fullVersion
+    version = fullVersionName
 }
 
 architectury {
@@ -29,7 +29,7 @@ subprojects {
     apply(plugin = "dev.architectury.loom")
     apply(plugin = "architectury-plugin")
 
-    base.archivesName.set(fullVersion + "-${project.name}")
+    base.archivesName.set(fullVersionName + "-${project.name}")
 
     repositories {
         mavenCentral()
