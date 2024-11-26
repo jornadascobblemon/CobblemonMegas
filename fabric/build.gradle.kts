@@ -1,4 +1,7 @@
 import org.gradle.kotlin.dsl.modApi
+plugins {
+    id("com.github.johnrengelman.shadow")
+}
 
 architectury {
     platformSetupLoomIde()
@@ -31,20 +34,19 @@ tasks {
         archiveClassifier.set("dev-slim")
     }
 
-    // shadowJar {
-    //     archiveClassifier.set("dev-shadow")
-    //     archiveBaseName.set("CobblemonMegas-${project.name}")
-    //     configurations = listOf(bundle)
-    //     mergeServiceFiles()
-    // }
-    //
-    // remapJar {
-    //     dependsOn(shadowJar)
-    //     inputFile.set(shadowJar.flatMap { it.archiveFile })
-    //     archiveBaseName.set("CobblemonMegas-${project.name}")
-    //     archiveVersion.set("${rootProject.version}")
-    // }
+    shadowJar {
+        archiveClassifier.set("dev-shadow")
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        configurations = listOf(bundle)
+        mergeServiceFiles()
+    }
 
+    remapJar {
+        dependsOn(shadowJar)
+        inputFile.set(shadowJar.flatMap { it.archiveFile })
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        archiveVersion.set("${rootProject.version}")
+    }
 }
 
 dependencies {
@@ -64,25 +66,25 @@ dependencies {
     modApi("me.lucko:fabric-permissions-api:${rootProject.property("fabric_permissions_api_version")}")
     modApi("dev.architectury:architectury-fabric:${rootProject.property("architectury_version")}")
 }
-//
-// tasks {
-//     // The AW file is needed in :fabric project resources when the game is run.
-//     val copyAccessWidener by registering(Copy::class) {
-//         from(loom.accessWidenerPath)
-//         into(generatedResources)
-//     }
-//
-//     shadowJar {}
-//
-//     processResources {
-//         inputs.property("version", rootProject.version)
-//
-//         filesMatching("fabric.mod.json") {
-//             expand("version" to rootProject.version)
-//         }
-//     }
-// }
-//
+
+tasks {
+    // The AW file is needed in :fabric project resources when the game is run.
+    val copyAccessWidener by registering(Copy::class) {
+        from(loom.accessWidenerPath)
+        into(generatedResources)
+    }
+
+    shadowJar {}
+
+    processResources {
+        inputs.property("version", rootProject.version)
+
+        filesMatching("fabric.mod.json") {
+            expand("version" to rootProject.version)
+        }
+    }
+}
+
 // configurations.all {
 //     resolutionStrategy {
 //         force("net.fabricmc:fabric-loader:0.15.11")
