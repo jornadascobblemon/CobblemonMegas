@@ -12,5 +12,5 @@ pluginManagement {
 include(
     "common",
     "fabric",
-    // "forge"
+    "forge"
 )

@@ -1,5 +1,5 @@
 plugins {
-    id("cobblemonmegas.platform-conventions")
+    id("com.github.johnrengelman.shadow")
 }
 
 architectury {
@@ -13,36 +13,52 @@ loom {
     }
 }
 
-repositories {
-    maven(url = "https://thedarkcolour.github.io/KotlinForForge/")
-    mavenLocal()
-    maven {
-        url = uri("https://cursemaven.com")
-        content {
-            includeGroup("curse.maven")
-        }
+val bundle: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
+tasks {
+    jar {
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        archiveClassifier.set("dev-slim")
+    }
+
+    shadowJar {
+        archiveClassifier.set("dev-shadow")
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        configurations = listOf(bundle)
+        mergeServiceFiles()
+    }
+
+    remapJar {
+        dependsOn(shadowJar)
+        inputFile.set(shadowJar.flatMap { it.archiveFile })
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        archiveVersion.set("${rootProject.version}")
     }
 }
 
+
+repositories {
+    maven(url = "https://thedarkcolour.github.io/KotlinForForge/")
+}
+
 dependencies {
-    forge(libs.forge)
-    modApi(libs.architecturyForge)
-//    modApi(libs.kotlinForForge)
-
-    //shadowCommon group: 'commons-io', name: 'commons-io', version: '2.6'
-
     implementation(project(":common", configuration = "namedElements")) {
         isTransitive = false
     }
-    implementation(libs.kotlinForForge)
     "developmentForge"(project(":common", configuration = "namedElements")) {
         isTransitive = false
     }
     bundle(project(path = ":common", configuration = "transformProductionForge")) {
         isTransitive = false
     }
-    testImplementation(project(":common", configuration = "namedElements"))
 
+    forge("net.minecraftforge:forge:${rootProject.property("forge_version")}")
+    modApi("dev.architectury:architectury-forge:${rootProject.property("architectury_version")}")
+    implementation("thedarkcolour:kotlinforforge:${rootProject.property("kotlinforforge_version")}")
+    testImplementation(project(":common", configuration = "namedElements"))
     modCompileOnly("com.cobblemon:forge:${rootProject.property("cobblemon_version")}+${rootProject.property("mc_version")}")
 }
 
@@ -60,29 +76,3 @@ tasks {
         }
     }
 }
-
-//jar {
-//    classifier("dev")
-//    manifest {
-//        attributes(
-//                "Specification-Title" to rootProject.mod_id,
-//                "Specification-Vendor" to "Cable MC",
-//                "Specification-Version" to "1",
-//                "Implementation-Title" to rootProject.mod_id,
-//                "Implementation-Version" to project.version,
-//                "Implementation-Vendor" to "Cable MC",
-//        )
-//    }
-//}
-//
-//sourcesJar {
-//    def commonSources = project(":common").sourcesJar
-//    dependsOn commonSources
-//    from commonSources.archiveFile.map { zipTree(it) }
-//}
-//
-//components.java {
-//    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-//        skip()
-//    }
-//}

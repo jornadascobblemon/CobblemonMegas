@@ -1,4 +1,5 @@
 import org.gradle.kotlin.dsl.modApi
+
 plugins {
     id("com.github.johnrengelman.shadow")
 }
@@ -85,8 +86,8 @@ tasks {
     }
 }
 
-// configurations.all {
-//     resolutionStrategy {
-//         force("net.fabricmc:fabric-loader:0.15.11")
-//     }
-// }
+configurations.all {
+    resolutionStrategy {
+        force("net.fabricmc:fabric-loader:0.15.11")
+    }
+}
