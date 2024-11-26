@@ -1,5 +1,7 @@
+import org.gradle.kotlin.dsl.modApi
+
 plugins {
-    id("cobblemonmegas.platform-conventions")
+    id("com.github.johnrengelman.shadow")
 }
 
 architectury {
@@ -18,9 +20,34 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
-    maven("https://maven.impactdev.net/repository/development/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
+}
+
+val bundle: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
+tasks {
+
+    jar {
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        archiveClassifier.set("dev-slim")
+    }
+
+    shadowJar {
+        archiveClassifier.set("dev-shadow")
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        configurations = listOf(bundle)
+        mergeServiceFiles()
+    }
+
+    remapJar {
+        dependsOn(shadowJar)
+        inputFile.set(shadowJar.flatMap { it.archiveFile })
+        archiveBaseName.set("CobblemonMegas-${project.name}")
+        archiveVersion.set("${rootProject.version}")
+    }
 }
 
 dependencies {
@@ -35,11 +62,10 @@ dependencies {
     }
 
     modImplementation("com.cobblemon:fabric:${rootProject.property("cobblemon_version")}+${rootProject.property("mc_version")}")
-
-    modImplementation(libs.fabricLoader)
-    modApi(libs.fabricApi)
-    modApi(libs.fabricPermissionsApi)
-    modApi(libs.architecturyFabric)
+    modImplementation("net.fabricmc:fabric-loader:${rootProject.property("fabric_loader_version")}")
+    modApi("net.fabricmc.fabric-api:fabric-api:${rootProject.property("fabric_api_version")}")
+    modApi("me.lucko:fabric-permissions-api:${rootProject.property("fabric_permissions_api_version")}")
+    modApi("dev.architectury:architectury-fabric:${rootProject.property("architectury_version")}")
 }
 
 tasks {
