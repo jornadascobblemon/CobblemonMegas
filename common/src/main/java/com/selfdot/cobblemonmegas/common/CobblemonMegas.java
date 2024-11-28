@@ -15,6 +15,7 @@ import com.selfdot.cobblemonmegas.common.command.permissions.PermissionValidator
 import com.selfdot.cobblemonmegas.common.command.permissions.VanillaPermissionValidator;
 import com.selfdot.cobblemonmegas.common.item.MegaStoneHeldItemManager;
 import com.selfdot.cobblemonmegas.common.util.DisableableMod;
+import com.selfdot.cobblemonmegas.common.util.ItemUtils;
 import com.selfdot.cobblemonmegas.common.util.MegaUtils;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
@@ -26,7 +27,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static net.minecraft.component.DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE;
 
 @Slf4j
 public class CobblemonMegas extends DisableableMod {
@@ -102,18 +104,20 @@ public class CobblemonMegas extends DisableableMod {
         config.reload();
     }
 
-    private static final Identifier KEY_STONE = Identifier.of("cobblemon", "key_stone");
     private Unit onBattleStartedPre(BattleStartedPreEvent event) {
         MegaUtils.deMegaEvolveAllPlayers(event.getBattle());
         event.getBattle().getPlayers().forEach(
             player -> {
                 Set<Identifier> keyItems = Cobblemon.playerDataManager.getGenericData(player).getKeyItems();
-                if (player.getInventory().containsAny(
-                    itemStack -> !itemStack.isEmpty() && itemStack.getOrCreateNbt().contains(DataKeys.NBT_KEY_KEY_STONE)
-                )) {
-                    keyItems.add(KEY_STONE);
+                boolean hasKeyStone = player.getInventory().containsAny(
+                        itemStack -> ItemUtils.getNbt(itemStack, DataKeys.MOD_NAMESPACE).contains(DataKeys.NBT_KEY_KEY_STONE)
+                );
+                // necessary for showdown
+                // https://gitlab.com/cable-mc/cobblemon/-/blob/1.6.0/common/src/main/kotlin/com/cobblemon/mod/common/battles/ShowdownActionRequest.kt?ref_type=heads#L78
+                if (hasKeyStone) {
+                    keyItems.add(DataKeys.COBBLEMON_KEY_STONE);
                 } else {
-                    keyItems.remove(KEY_STONE);
+                    keyItems.remove(DataKeys.COBBLEMON_KEY_STONE);
                 }
             }
         );
@@ -126,14 +130,14 @@ public class CobblemonMegas extends DisableableMod {
     }
 
     private EventResult onItemDrop(PlayerEntity player, ItemEntity itemEntity) {
-        NbtCompound nbt = itemEntity.getStack().getNbt();
-        if (nbt == null || !nbt.getBoolean(DataKeys.NBT_KEY_KEY_STONE)) return EventResult.pass();
-        nbt.remove("Enchantments");
+        ItemStack itemStack = itemEntity.getStack();
+        NbtCompound nbt = ItemUtils.getNbt(itemStack, DataKeys.MOD_NAMESPACE);
+        if (nbt.isEmpty() || !nbt.contains(DataKeys.NBT_KEY_KEY_STONE)) return EventResult.pass();
+        if (!nbt.getBoolean(DataKeys.NBT_KEY_KEY_STONE)) itemStack.set(ENCHANTMENT_GLINT_OVERRIDE, false);
         return EventResult.pass();
     }
 
     private void onPlayerJoin(ServerPlayerEntity player) {
         MegaUtils.updateKeyStoneGlow(player);
     }
-
 }

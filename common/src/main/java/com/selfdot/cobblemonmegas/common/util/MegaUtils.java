@@ -11,6 +11,7 @@ import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.selfdot.cobblemonmegas.common.CobblemonMegas;
 import com.selfdot.cobblemonmegas.common.DataKeys;
 import com.selfdot.cobblemonmegas.common.item.MegaStoneHeldItemManager;
+import dev.architectury.event.EventResult;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -25,6 +26,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
+
+import static net.minecraft.component.DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE;
 
 @Slf4j
 public class MegaUtils {
@@ -108,14 +111,13 @@ public class MegaUtils {
     }
 
     public static void updateKeyStoneGlow(ItemStack itemStack, PlayerEntity player) {
-        NbtCompound nbt = itemStack.getNbt();
-        if (nbt == null || !nbt.getBoolean(DataKeys.NBT_KEY_KEY_STONE)) return;
+        NbtCompound nbt = ItemUtils.getNbt(itemStack, DataKeys.MOD_NAMESPACE);
+        if (nbt.isEmpty() || !nbt.contains(DataKeys.NBT_KEY_KEY_STONE)) return;
+
         if (CobblemonMegas.getInstance().getToMegaEvolveThisTurn().contains(player.getUuid())) {
-            NbtList enchantmentsNbt = new NbtList();
-            enchantmentsNbt.add(new NbtCompound());
-            nbt.put("Enchantments", enchantmentsNbt);
+            itemStack.set(ENCHANTMENT_GLINT_OVERRIDE, true);
         } else {
-            nbt.remove("Enchantments");
+            itemStack.set(ENCHANTMENT_GLINT_OVERRIDE, false);
         }
     }
 
