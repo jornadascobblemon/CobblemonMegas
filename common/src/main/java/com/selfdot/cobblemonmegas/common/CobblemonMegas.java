@@ -107,7 +107,7 @@ public class CobblemonMegas extends DisableableMod {
         MegaUtils.deMegaEvolveAllPlayers(event.getBattle());
         event.getBattle().getPlayers().forEach(
             player -> {
-                Set<Identifier> keyItems = Cobblemon.playerData.get(player).getKeyItems();
+                Set<Identifier> keyItems = Cobblemon.playerDataManager.getGenericData(player).getKeyItems();
                 if (player.getInventory().containsAny(
                     itemStack -> !itemStack.isEmpty() && itemStack.getOrCreateNbt().contains(DataKeys.NBT_KEY_KEY_STONE)
                 )) {
