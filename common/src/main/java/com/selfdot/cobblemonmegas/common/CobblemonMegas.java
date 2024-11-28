@@ -102,7 +102,7 @@ public class CobblemonMegas extends DisableableMod {
         config.reload();
     }
 
-    private static final Identifier KEY_STONE = new Identifier("cobblemon", "key_stone");
+    private static final Identifier KEY_STONE = Identifier.of("cobblemon", "key_stone");
     private Unit onBattleStartedPre(BattleStartedPreEvent event) {
         MegaUtils.deMegaEvolveAllPlayers(event.getBattle());
         event.getBattle().getPlayers().forEach(
