@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -13,8 +14,8 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 architectury {
@@ -31,21 +32,23 @@ loom {
 }
 
 dependencies {
-minecraft("net.minecraft:minecraft:${rootProject.property("mc_version")}")
-mappings("net.fabricmc:yarn:${rootProject.property("yarn_version")}")
+    minecraft("net.minecraft:minecraft:${rootProject.property("mc_version")}")
+    mappings("net.fabricmc:yarn:${rootProject.property("yarn_version")}")
 }
 
 tasks {
-withType<JavaCompile> {
-    options.encoding = "UTF-8"
-    options.release.set(17)
-}
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(21)
+    }
 
-withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-}
+        tasks.withType<KotlinCompile> {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_21)
+            }
+        }
 
-withType<Jar> {
-    from(rootProject.file("LICENSE"))
-}
+    withType<Jar> {
+        from(rootProject.file("LICENSE"))
+    }
 }

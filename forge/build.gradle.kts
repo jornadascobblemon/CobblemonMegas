@@ -43,7 +43,7 @@ dependencies {
     }
     testImplementation(project(":common", configuration = "namedElements"))
 
-    modCompileOnly("com.cobblemon:forge:${rootProject.property("cobblemon_version")}+${rootProject.property("mc_version")}")
+    modCompileOnly("com.cobblemon:forge:${rootProject.property("cobblemon_version")}")
 }
 
 tasks {

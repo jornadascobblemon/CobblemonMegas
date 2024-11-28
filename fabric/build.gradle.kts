@@ -34,7 +34,7 @@ dependencies {
         isTransitive = false
     }
 
-    modImplementation("com.cobblemon:fabric:${rootProject.property("cobblemon_version")}+${rootProject.property("mc_version")}")
+    modImplementation("com.cobblemon:fabric:${rootProject.property("cobblemon_version")}")
 
     modImplementation(libs.fabricLoader)
     modApi(libs.fabricApi)
@@ -62,6 +62,6 @@ tasks {
 
 configurations.all {
     resolutionStrategy {
-        force("net.fabricmc:fabric-loader:0.15.11")
+        force("net.fabricmc:fabric-loader:0.16.5")
     }
 }
