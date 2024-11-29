@@ -37,7 +37,8 @@ dependencies {
     modImplementation("com.cobblemon:fabric:${rootProject.property("cobblemon_version")}")
 
     modImplementation(libs.fabricLoader)
-    modApi(libs.fabricApi)
+    modRuntimeOnly(libs.fabricApi)
+    modImplementation(libs.fabricKotlin)
     modApi(libs.fabricPermissionsApi)
     modApi(libs.architecturyFabric)
 }

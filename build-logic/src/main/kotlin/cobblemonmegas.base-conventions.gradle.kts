@@ -24,6 +24,7 @@ architectury {
 
 loom {
     silentMojangMappingsLicense()
+    enableTransitiveAccessWideners.set(true)
 
     @Suppress("UnstableApiUsage")
     mixin {
