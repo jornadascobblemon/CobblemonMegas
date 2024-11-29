@@ -9,7 +9,7 @@ import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import com.selfdot.cobblemonmegas.common.CobblemonMegas;
 import com.selfdot.cobblemonmegas.common.DataKeys;
-import com.selfdot.cobblemonmegas.common.util.ItemUtils;
+import com.selfdot.cobblemonmegas.common.util.NbtUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class MegaStoneHeldItemManager implements HeldItemManager {
 
@@ -36,16 +35,15 @@ public class MegaStoneHeldItemManager implements HeldItemManager {
             return ItemStack.EMPTY;
         }
         ItemStack megaStone = new ItemStack(Items.EMERALD);
-        NbtCompound nbt = megaStone.getOrCreateNbt();
-        nbt.putString(DataKeys.NBT_KEY_MEGA_STONE, id);
-        nbt.putInt("CustomModelData", customModelData(id));
-        nbt.putBoolean("italic", false);
+        NbtUtils.setNbtString(megaStone, "", DataKeys.NBT_KEY_MEGA_STONE, id);
+        NbtUtils.setNbtInt(megaStone, "", "CustomModelData", customModelData(id));
+        NbtUtils.setNbtBoolean(megaStone, "", "italic", false);
         String displayName = id.substring(0, 1).toUpperCase() + id.substring(1);
         if (displayName.endsWith("x") || displayName.endsWith("y")) {
             displayName = displayName.substring(0, id.length() - 1) +
                 displayName.substring(id.length() - 1).toUpperCase();
         }
-        ItemUtils.setNameNoItalics(megaStone, displayName);
+        NbtUtils.setItemName(megaStone, displayName, true);
         return megaStone;
     }
 
@@ -84,12 +82,13 @@ public class MegaStoneHeldItemManager implements HeldItemManager {
     }
 
     public String showdownId(Pokemon pokemon) {
-        ItemStack itemStack = pokemon.heldItem();
-        NbtCompound nbt = itemStack.getNbt();
-        if (nbt == null) return null;
-        String id = nbt.getString(DataKeys.NBT_KEY_MEGA_STONE);
-        if (!MEGA_STONE_IDS.containsKey(id)) return null;
-        return id;
+        NbtCompound nbt = NbtUtils.getNbt(pokemon.heldItem(), "");
+        if (nbt.isEmpty() || !nbt.contains(DataKeys.NBT_KEY_MEGA_STONE)) return null;
+
+        String nbtString = nbt.getString(DataKeys.NBT_KEY_MEGA_STONE);
+        if (nbtString.isEmpty()) return null;
+        if (!MEGA_STONE_IDS.containsKey(nbtString)) return null;
+        return nbtString;
     }
 
     @Nullable

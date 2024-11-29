@@ -11,12 +11,10 @@ import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.selfdot.cobblemonmegas.common.CobblemonMegas;
 import com.selfdot.cobblemonmegas.common.DataKeys;
 import com.selfdot.cobblemonmegas.common.item.MegaStoneHeldItemManager;
-import dev.architectury.event.EventResult;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -111,7 +109,7 @@ public class MegaUtils {
     }
 
     public static void updateKeyStoneGlow(ItemStack itemStack, PlayerEntity player) {
-        NbtCompound nbt = ItemUtils.getNbt(itemStack, DataKeys.MOD_NAMESPACE);
+        NbtCompound nbt = NbtUtils.getNbt(itemStack, DataKeys.MOD_NAMESPACE);
         if (nbt.isEmpty() || !nbt.contains(DataKeys.NBT_KEY_KEY_STONE)) return;
 
         if (CobblemonMegas.getInstance().getToMegaEvolveThisTurn().contains(player.getUuid())) {

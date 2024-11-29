@@ -15,8 +15,8 @@ import com.selfdot.cobblemonmegas.common.command.permissions.PermissionValidator
 import com.selfdot.cobblemonmegas.common.command.permissions.VanillaPermissionValidator;
 import com.selfdot.cobblemonmegas.common.item.MegaStoneHeldItemManager;
 import com.selfdot.cobblemonmegas.common.util.DisableableMod;
-import com.selfdot.cobblemonmegas.common.util.ItemUtils;
 import com.selfdot.cobblemonmegas.common.util.MegaUtils;
+import com.selfdot.cobblemonmegas.common.util.NbtUtils;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
@@ -110,7 +110,7 @@ public class CobblemonMegas extends DisableableMod {
             player -> {
                 Set<Identifier> keyItems = Cobblemon.playerDataManager.getGenericData(player).getKeyItems();
                 boolean hasKeyStone = player.getInventory().containsAny(
-                        itemStack -> ItemUtils.getNbt(itemStack, DataKeys.MOD_NAMESPACE).contains(DataKeys.NBT_KEY_KEY_STONE)
+                        itemStack -> NbtUtils.getNbt(itemStack, "").contains(DataKeys.NBT_KEY_KEY_STONE)
                 );
                 // necessary for showdown
                 // https://gitlab.com/cable-mc/cobblemon/-/blob/1.6.0/common/src/main/kotlin/com/cobblemon/mod/common/battles/ShowdownActionRequest.kt?ref_type=heads#L78
@@ -131,7 +131,7 @@ public class CobblemonMegas extends DisableableMod {
 
     private EventResult onItemDrop(PlayerEntity player, ItemEntity itemEntity) {
         ItemStack itemStack = itemEntity.getStack();
-        NbtCompound nbt = ItemUtils.getNbt(itemStack, DataKeys.MOD_NAMESPACE);
+        NbtCompound nbt = NbtUtils.getNbt(itemStack, "");
         if (nbt.isEmpty() || !nbt.contains(DataKeys.NBT_KEY_KEY_STONE)) return EventResult.pass();
         if (!nbt.getBoolean(DataKeys.NBT_KEY_KEY_STONE)) itemStack.set(ENCHANTMENT_GLINT_OVERRIDE, false);
         return EventResult.pass();

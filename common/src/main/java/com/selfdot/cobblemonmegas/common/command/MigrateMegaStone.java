@@ -4,7 +4,9 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.selfdot.cobblemonmegas.common.item.MegaStoneHeldItemManager;
+import com.selfdot.cobblemonmegas.common.util.NbtUtils;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -18,9 +20,11 @@ public class MigrateMegaStone implements Command<ServerCommandSource> {
         var handStack = player.getMainHandStack();
         // You would think an empty hand would not retain NBT from the last held item, right? WRONG!
         if (handStack.isEmpty()) return error(player, "Hand does not contain valid or old mega stone");
-        if (handStack.getNbt() == null) return error(player, "Hand does not contain valid or old mega stone");
-        if (!handStack.getOrCreateNbt().contains("ShowdownID")) return error(player, "Hand does not contain valid or old mega stone");
-        var showdownId = handStack.getOrCreateNbt().getString("ShowdownID");
+
+        NbtCompound handStackNbt = NbtUtils.getNbt(handStack, "");
+        if (handStackNbt.isEmpty()) return error(player, "Hand does not contain valid or old mega stone");
+        if (!handStackNbt.contains("ShowdownID")) return error(player, "Hand does not contain valid or old mega stone");
+        var showdownId = handStackNbt.getString("ShowdownID");
 
         var newMegaStone = MegaStoneHeldItemManager.getInstance().getMegaStoneItem(showdownId);
         if (newMegaStone == ItemStack.EMPTY) return error(player, "Could not migrate mega stone");
