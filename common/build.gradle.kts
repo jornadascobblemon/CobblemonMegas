@@ -3,7 +3,10 @@ plugins {
 }
 
 architectury {
-    common()
+    common(
+        "fabric",
+        // "forge"
+    )
 }
 
 repositories {
@@ -20,7 +23,9 @@ repositories {
 dependencies {
     modImplementation(libs.fabricLoader)
     modImplementation("com.google.code.findbugs:jsr305:3.0.2")
-    modApi("com.cobblemon:mod:${rootProject.property("cobblemon_version")}+${rootProject.property("mc_version")}")
+    modCompileOnly("com.cobblemon:mod:${rootProject.property("cobblemon_version")}") {
+        isTransitive = false
+    }
     modApi(libs.architectury)
 
     compileOnly("net.luckperms:api:${rootProject.property("luckperms_version")}")

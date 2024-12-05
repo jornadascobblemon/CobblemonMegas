@@ -6,11 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.selfdot.cobblemonmegas.common.DataKeys;
 import com.selfdot.cobblemonmegas.common.item.KeyStoneType;
-import com.selfdot.cobblemonmegas.common.util.ItemUtils;
+import com.selfdot.cobblemonmegas.common.util.NbtUtils;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -41,10 +40,9 @@ public class GiveKeyStoneCommand implements Command<ServerCommandSource> {
         KeyStoneType type = KEY_STONE_TYPES.get(keyStoneType);
         players.forEach(player -> {
             ItemStack keyStone = new ItemStack(Items.EMERALD);
-            NbtCompound nbt = keyStone.getOrCreateNbt();
-            nbt.putInt("CustomModelData", type.customModelData());
-            nbt.putBoolean(DataKeys.NBT_KEY_KEY_STONE, true);
-            ItemUtils.setNameNoItalics(keyStone, type.name());
+            NbtUtils.setNbtInt(keyStone, "", "CustomModelData", type.customModelData());
+            NbtUtils.setNbtBoolean(keyStone, "", DataKeys.NBT_KEY_KEY_STONE, true);
+            NbtUtils.setItemName(keyStone, type.name(), false);
             player.giveItemStack(keyStone);
         });
         return SINGLE_SUCCESS;

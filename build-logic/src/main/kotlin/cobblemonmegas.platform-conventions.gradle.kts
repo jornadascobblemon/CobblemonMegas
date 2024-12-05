@@ -20,6 +20,7 @@ tasks {
         archiveBaseName.set("CobblemonMegas-${project.name}")
         configurations = listOf(bundle)
         mergeServiceFiles()
+        archiveVersion.set("${rootProject.version}")
     }
 
     remapJar {

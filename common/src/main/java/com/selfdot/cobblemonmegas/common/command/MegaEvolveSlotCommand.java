@@ -12,6 +12,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.selfdot.cobblemonmegas.common.CobblemonMegas;
 import com.selfdot.cobblemonmegas.common.DataKeys;
 import com.selfdot.cobblemonmegas.common.util.MegaUtils;
+import com.selfdot.cobblemonmegas.common.util.NbtUtils;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -48,9 +49,12 @@ public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
             pokemon.getSpecies().getName().equalsIgnoreCase("charizard") ||
                 pokemon.getSpecies().getName().equalsIgnoreCase("mewtwo")
         ) {
-            NbtCompound nbtCompound = pokemon.heldItem().getNbt();
-            if (nbtCompound == null) return 0;
-            megaType = nbtCompound.getString(DataKeys.NBT_KEY_MEGA_STONE).endsWith("x") ?
+            NbtCompound nbt = NbtUtils.getNbt(pokemon.heldItem(), "");
+            if (nbt.isEmpty() || !nbt.contains(DataKeys.NBT_KEY_MEGA_STONE)) return 0;
+
+            String nbtString = nbt.getString(DataKeys.NBT_KEY_MEGA_STONE);
+            if (nbtString.isEmpty()) return 0;
+            megaType = nbt.getString(DataKeys.NBT_KEY_MEGA_STONE).endsWith("x") ?
                 DataKeys.MEGA_X : DataKeys.MEGA_Y;
         }
 

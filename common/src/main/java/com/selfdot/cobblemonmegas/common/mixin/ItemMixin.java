@@ -2,6 +2,8 @@ package com.selfdot.cobblemonmegas.common.mixin;
 
 import com.selfdot.cobblemonmegas.common.DataKeys;
 import com.selfdot.cobblemonmegas.common.util.MegaUtils;
+import com.selfdot.cobblemonmegas.common.util.NbtUtils;
+import dev.architectury.event.EventResult;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,8 +26,9 @@ public abstract class ItemMixin {
     ) {
         if (!(user instanceof ServerPlayerEntity player)) return;
         ItemStack itemStack = player.getStackInHand(hand);
-        NbtCompound nbt = itemStack.getNbt();
-        if (nbt == null || !nbt.getBoolean(DataKeys.NBT_KEY_KEY_STONE)) return;
+        NbtCompound nbt = NbtUtils.getNbt(itemStack, "");
+        if (nbt.isEmpty() || !nbt.contains(DataKeys.NBT_KEY_KEY_STONE)) return;
+        if (!nbt.getBoolean(DataKeys.NBT_KEY_KEY_STONE)) return;
         MegaUtils.attemptMegaEvolveInBattle(player, false);
         cir.setReturnValue(TypedActionResult.consume(itemStack));
     }

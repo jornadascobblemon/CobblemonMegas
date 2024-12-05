@@ -1,5 +1,7 @@
 package com.selfdot.cobblemonmegas.common;
 
+import net.minecraft.util.Identifier;
+
 public class DataKeys {
 
     public static final String MOD_NAMESPACE = "cobblemonmegas";
@@ -10,5 +12,6 @@ public class DataKeys {
     public static final String NBT_KEY_KEY_STONE = "keyStone";
     public static final String MEGA_STONE_WHITELIST = "megaStoneWhitelist";
     public static final String MEGA_RAYQUAZA_ALLOWED = "megaRayquazaAllowed";
+    public static final Identifier COBBLEMON_KEY_STONE = Identifier.of("cobblemon", "key_stone");
 
 }
