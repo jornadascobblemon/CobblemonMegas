@@ -19,7 +19,7 @@ java {
 }
 
 architectury {
-    minecraft = project.property("mc_version").toString()
+    minecraft = project.property("minecraft_version").toString()
 }
 
 loom {
@@ -33,7 +33,7 @@ loom {
 }
 
 dependencies {
-    minecraft("net.minecraft:minecraft:${rootProject.property("mc_version")}")
+    minecraft("net.minecraft:minecraft:${rootProject.property("minecraft_version")}")
     mappings("net.fabricmc:yarn:${rootProject.property("yarn_version")}")
 }
 
@@ -43,11 +43,11 @@ tasks {
         options.release.set(21)
     }
 
-        tasks.withType<KotlinCompile> {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_21)
-            }
+    withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
         }
+    }
 
     withType<Jar> {
         from(rootProject.file("LICENSE"))
