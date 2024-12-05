@@ -18,7 +18,7 @@ java {
 }
 
 architectury {
-    minecraft = project.property("mc_version").toString()
+    minecraft = project.property("minecraft_version").toString()
 }
 
 loom {
@@ -31,21 +31,21 @@ loom {
 }
 
 dependencies {
-minecraft("net.minecraft:minecraft:${rootProject.property("mc_version")}")
-mappings("net.fabricmc:yarn:${rootProject.property("yarn_version")}")
+    minecraft("net.minecraft:minecraft:${rootProject.property("minecraft_version")}")
+    mappings("net.fabricmc:yarn:${rootProject.property("yarn_version")}")
 }
 
 tasks {
-withType<JavaCompile> {
-    options.encoding = "UTF-8"
-    options.release.set(17)
-}
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(17)
+    }
 
-withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-}
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "17"
+    }
 
-withType<Jar> {
-    from(rootProject.file("LICENSE"))
-}
+    withType<Jar> {
+        from(rootProject.file("LICENSE"))
+    }
 }
