@@ -1,6 +1,5 @@
 package com.selfdot.cobblemonmegas.common.command;
 
-import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor;
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
@@ -18,10 +17,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
 public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
 
     @Override
@@ -31,9 +26,7 @@ public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
 
         Pokemon pokemon = PartySlotArgumentType.Companion.getPokemon(context, "pokemon");
 
-        if (Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
-            .anyMatch(aspect -> pokemon.getAspects().contains(aspect))
-        ) {
+        if (MegaUtils.containsMegaAspects(pokemon)) {
             MegaUtils.deMegaEvolve(pokemon);
             return SINGLE_SUCCESS;
         }
@@ -60,9 +53,8 @@ public class MegaEvolveSlotCommand implements Command<ServerCommandSource> {
 
         PokemonBattle battle = BattleRegistry.INSTANCE.getBattleByParticipatingPlayer(player);
         if (battle == null) {
-            // Save the original ability to restore it later
-            ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
-            originalAbilities.put(pokemon.getUuid(), pokemon.getAbility());
+            // Save the ability to restore it later
+            MegaUtils.savePreviousAbility(pokemon);
 
             new FlagSpeciesFeature(megaType, true).apply(pokemon);
         } else {

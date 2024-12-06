@@ -1,6 +1,5 @@
 package com.selfdot.cobblemonmegas.common.mixin;
 
-import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
@@ -17,9 +16,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Mixin(DetailsChangeInstruction.class)
 public abstract class DetailsChangeInstructionMixin {
@@ -47,9 +43,9 @@ public abstract class DetailsChangeInstructionMixin {
                 Pokemon originalPokemon = battlePokemon.getOriginalPokemon();
                 Pokemon effectedPokemon = battlePokemon.getEffectedPokemon();
 
-                // Save the original ability to restore it later
-                ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
-                originalAbilities.put(originalPokemon.getUuid(), originalPokemon.getAbility());
+                // Save the ability to restore it later
+                MegaUtils.savePreviousAbility(originalPokemon);
+                MegaUtils.savePreviousAbility(effectedPokemon);
 
                 new FlagSpeciesFeature(megaType, true).apply(originalPokemon);
                 new FlagSpeciesFeature(megaType, true).apply(effectedPokemon);
