@@ -1,6 +1,7 @@
 package com.selfdot.cobblemonmegas.common.util;
 
-import com.cobblemon.mod.common.api.abilities.Ability;
+import com.cobblemon.mod.common.api.Priority;
+import com.cobblemon.mod.common.api.abilities.*;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.battles.model.actor.BattleActor;
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
@@ -20,9 +21,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static net.minecraft.component.DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE;
@@ -84,24 +85,22 @@ public class MegaUtils {
         battle.getActors().forEach(
             actor -> {
                 if (!actor.getPlayerUUIDs().iterator().hasNext()) return;
-                actor.getPokemonList().forEach(battlePokemon -> deMegaEvolve(battlePokemon.getOriginalPokemon()));
+                actor.getPokemonList().forEach(battlePokemon -> {
+                    Pokemon pokemon = battlePokemon.getOriginalPokemon();
+                    if (containsMegaAspects(pokemon)) deMegaEvolve(pokemon);
+                });
             }
         );
     }
 
     public static void deMegaEvolve(Pokemon pokemon) {
-        Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
-            .forEach(megaAspect ->
-                    new FlagSpeciesFeature(megaAspect, false).apply(pokemon)
-            );
+        // Remove the mega aspect
+        removeMegaAspects(pokemon);
 
-        // If it mega evolved, restore the original ability and remove it from the map
-        ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
-        Ability originalAbility = originalAbilities.get(pokemon.getUuid());
-        if (originalAbility != null) {
-            pokemon.updateAbility(originalAbility);
-            originalAbilities.remove(pokemon.getUuid());
-        }
+        // Restore the original ability
+        NbtCompound pokemonNbt = pokemon.getPersistentData();
+        if (pokemonNbt.isEmpty() || !pokemonNbt.contains(DataKeys.NBT_KEY_PREVIOUS_ABILITY)) return;
+        restorePreviousAbility(pokemon);
     }
 
     private static void sendError(ServerPlayerEntity player, String error) {
@@ -167,10 +166,92 @@ public class MegaUtils {
             ));
         }
 
-        // Save the original ability to restore it later
-        ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
-        originalAbilities.put(pokemon.getUuid(), pokemon.getAbility());
+        // Save the ability to restore it later
+        savePreviousAbility(pokemon);
         return true;
     }
 
+    public static void savePreviousAbility(Pokemon pokemon) {
+        // Save an NBT string in the Pokémon persistent data with the key "previousAbility" and the name of the ability before it megaevolves
+        Ability previousAbility = pokemon.getAbility();
+        NbtUtils.setPokemonNbtString(pokemon, DataKeys.NBT_KEY_PREVIOUS_ABILITY, previousAbility.getName());
+    }
+
+    public static boolean containsMegaAspects(Pokemon pokemon) {
+        return Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
+            .anyMatch(aspect -> pokemon.getAspects().contains(aspect));
+    }
+
+    private static void removeMegaAspects(Pokemon pokemon) {
+        // For each of the mega aspects, check if it's in the features and remove it
+        Stream.of(DataKeys.MEGA, DataKeys.MEGA_X, DataKeys.MEGA_Y)
+            .filter(aspect -> pokemon.getAspects().contains(aspect))
+            .forEach(aspect -> new FlagSpeciesFeature(aspect, false).apply(pokemon));
+    }
+
+    private static void restorePreviousAbility(Pokemon pokemon) {
+        Optional<Ability> previousAbility = getPreviousAbility(pokemon);
+        // if we didn't find the previousAbility, better not to do anything
+        if (previousAbility.isEmpty()) return;
+        pokemon.updateAbility(previousAbility.get());
+        NbtUtils.removePokemonNbtString(pokemon, DataKeys.NBT_KEY_PREVIOUS_ABILITY);
+    }
+
+    /**
+     * Retrieves a Pokémon's previous ability from its persistent data, species ability pool or the global Abilities registries.
+     * If the previous ability is not stored in the Pokémon's persistent data, the method falls back to the first ability found from the species AbilityPool.
+     *
+     * @param pokemon the Pokémon to retrieve the previous ability for
+     * @return an Optional containing the previous ability, or an empty Optional if not found
+     */
+    private static Optional<Ability> getPreviousAbility(Pokemon pokemon) {
+        NbtCompound pokemonNbt = pokemon.getPersistentData();
+        AbilityPool speciesAbilities = pokemon.getSpecies().getAbilities();
+        String previousAbilityName = pokemonNbt.getString(DataKeys.NBT_KEY_PREVIOUS_ABILITY);
+
+        // If no previous ability is stored, fallback to the first ability from the species
+        if (previousAbilityName.isEmpty()) {
+            log.warn("Previous ability value is empty. Using the first species ability as a fallback for {}.",
+                    pokemon.getDisplayName().getString());
+
+            for (PotentialAbility pa : speciesAbilities) {
+                // Return the first one we encounter
+                return Optional.of(pa.getTemplate().create(false, Priority.NORMAL));
+            }
+
+            // If speciesAbilities is empty for some reason
+            log.error("No abilities found in species for Pokémon {}.",
+                    pokemon.getDisplayName().getString());
+            return Optional.empty();
+        }
+
+        // Attempt to find the previous ability in the species ability pool
+        AbilityTemplate foundTemplate = null;
+        for (PotentialAbility pa : speciesAbilities) {
+            AbilityTemplate template = pa.getTemplate();
+            if (template.getName().equalsIgnoreCase(previousAbilityName)) {
+                foundTemplate = template;
+                break;
+            }
+        }
+
+        if (foundTemplate != null) {
+            return Optional.of(foundTemplate.create(false, Priority.NORMAL));
+        }
+
+        // if we didn't find the ability in the species AbilityPool, something is sus, but we're going to set it anyway
+        // if the species have this ability, check if it was removed from the AbilityPool at runtime
+        // if the species doesn't have the ability, check if this ability was added to this particular Pokémon at runtime
+        // check other mods or data packs that can be messing with species and/or pokémon abilities
+        AbilityTemplate previousAbilityTemplate = Abilities.INSTANCE.get(previousAbilityName.toLowerCase());
+        if (previousAbilityTemplate != null) {
+            log.warn("Ability '{}' was found in the Abilities registry, but not in the species AbilityPool for {}. Using it anyway.", previousAbilityName, pokemon.getDisplayName().getString());
+            return Optional.of(previousAbilityTemplate.create(false, Priority.NORMAL));
+        }
+
+        // At this point, we failed to find the ability anywhere
+        log.error("Couldn't find previous ability '{}' for Pokémon {} in either species pool or in the Abilities registry.",
+                previousAbilityName, pokemon.getDisplayName().getString());
+        return Optional.empty();
+    }
 }
