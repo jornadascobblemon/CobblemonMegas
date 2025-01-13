@@ -29,6 +29,7 @@
     "fabric": ">=0.104.0",
     "architectury": ">=13.0.2",
     "minecraft": ">=1.21.1",
-    "java": ">=21"
+    "java": ">=21",
+    "cobblemon": ">=1.6.0"
   }
 }

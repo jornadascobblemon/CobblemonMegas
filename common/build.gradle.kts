@@ -25,6 +25,7 @@ dependencies {
     modImplementation("com.google.code.findbugs:jsr305:3.0.2")
     modCompileOnly("com.cobblemon:mod:${rootProject.property("cobblemon_version")}") {
         isTransitive = false
+        isChanging = true
     }
     modApi(libs.architectury)
 
@@ -36,4 +37,8 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
 }

@@ -1,10 +1,9 @@
 package com.selfdot.cobblemonmegas.common.mixin;
 
-import com.cobblemon.mod.common.api.abilities.Ability;
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
-import com.cobblemon.mod.common.battles.interpreter.instructions.DetailsChangeInstruction;
+import com.cobblemon.mod.common.battles.interpreter.instructions.FormeChangeInstruction;
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.selfdot.cobblemonmegas.common.CobblemonMegas;
@@ -18,17 +17,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-@Mixin(DetailsChangeInstruction.class)
-public abstract class DetailsChangeInstructionMixin {
+@Mixin(FormeChangeInstruction.class)
+public abstract class FormeChangeInstructionMixin {
 
     @Shadow(remap = false)
     public abstract BattleMessage getMessage();
 
     @Inject(method = "invoke", at = @At("TAIL"), remap = false)
-    private void injectDetailsChangeChangeInstruction(PokemonBattle battle, CallbackInfo ci) {
+    private void injectFormeChangeChangeInstruction(PokemonBattle battle, CallbackInfo ci) {
+        // example rawMessage:
+        // "detailschange|p1a: 01942d82-d8f2-7fc3-acf5-f930233dd5cb|Heracross-Mega, 01942d82-d8f2-7fc3-acf5-f930233dd5cb, M"
         String s1 = getMessage().argumentAt(1);
         if (s1 == null) return;
         String[] s2 = s1.split(",");
@@ -47,9 +45,9 @@ public abstract class DetailsChangeInstructionMixin {
                 Pokemon originalPokemon = battlePokemon.getOriginalPokemon();
                 Pokemon effectedPokemon = battlePokemon.getEffectedPokemon();
 
-                // Save the original ability to restore it later
-                ConcurrentHashMap<UUID, Ability> originalAbilities = CobblemonMegas.getInstance().getOriginalAbilities();
-                originalAbilities.put(originalPokemon.getUuid(), originalPokemon.getAbility());
+                // Save the ability to restore it later
+                MegaUtils.savePreviousAbility(originalPokemon);
+                MegaUtils.savePreviousAbility(effectedPokemon);
 
                 new FlagSpeciesFeature(megaType, true).apply(originalPokemon);
                 new FlagSpeciesFeature(megaType, true).apply(effectedPokemon);

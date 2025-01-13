@@ -1,5 +1,6 @@
 package com.selfdot.cobblemonmegas.common.util;
 
+import com.cobblemon.mod.common.pokemon.Pokemon;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -169,5 +170,30 @@ public class NbtUtils {
 
             return MutableText.of(PlainTextContent.EMPTY).append(value).setStyle(textStyle);
         });
+    }
+
+    /**
+     * Sets a string value in the persistent NBT data of the given Pokémon.
+     *
+     * @param pokemon the Pokémon to modify
+     * @param key     the NBT key to set
+     * @param value   the string value to assign
+     */
+    public static void setPokemonNbtString(@NotNull Pokemon pokemon, @NotNull String key, @NotNull String value) {
+        pokemon.getPersistentData().putString(key, value);
+        // we have to emit to update the persistent data
+        pokemon.getAnyChangeObservable().emit();
+    }
+
+    /**
+     * Removes a string value from the persistent NBT data of the given Pokémon.
+     *
+     * @param pokemon the Pokémon to modify
+     * @param key     the NBT key to remove
+     */
+    public static void removePokemonNbtString(@NotNull Pokemon pokemon, @NotNull String key) {
+        pokemon.getPersistentData().remove(key);
+        // we have to emit to update the persistent data
+        pokemon.getAnyChangeObservable().emit();
     }
 }
