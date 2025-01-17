@@ -52,16 +52,8 @@ public abstract class FormeChangeInstructionMixin {
                 MegaUtils.savePreviousAbility(originalPokemon);
                 MegaUtils.savePreviousAbility(effectedPokemon);
 
-                // TODO: transform originalPokemon and effectPokemon to JSON and print to console
-//                System.out.println("original pokemon before setting flagspeciesfeature: " + originalPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
-//                System.out.println("effectedPokemonJson before setting flagspeciesfeature: " + effectedPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
-
                 new FlagSpeciesFeature(megaType, true).apply(originalPokemon);
                 new FlagSpeciesFeature(megaType, true).apply(effectedPokemon);
-
-//                System.out.println("original pokemon after setting flagspeciesfeature: " + originalPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
-//                System.out.println("effectedPokemonJson after setting flagspeciesfeature: " + effectedPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
-
 
                 ServerPlayerEntity player = battlePokemon.getOriginalPokemon().getOwnerPlayer();
                 if (player == null) return Unit.INSTANCE;
