@@ -6,10 +6,13 @@ import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
 import com.cobblemon.mod.common.battles.interpreter.instructions.FormeChangeInstruction;
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon;
 import com.cobblemon.mod.common.pokemon.Pokemon;
+import com.google.gson.*;
 import com.selfdot.cobblemonmegas.common.CobblemonMegas;
 import com.selfdot.cobblemonmegas.common.DataKeys;
 import com.selfdot.cobblemonmegas.common.util.MegaUtils;
 import kotlin.Unit;
+import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,8 +52,17 @@ public abstract class FormeChangeInstructionMixin {
                 MegaUtils.savePreviousAbility(originalPokemon);
                 MegaUtils.savePreviousAbility(effectedPokemon);
 
+                // TODO: transform originalPokemon and effectPokemon to JSON and print to console
+//                System.out.println("original pokemon before setting flagspeciesfeature: " + originalPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
+//                System.out.println("effectedPokemonJson before setting flagspeciesfeature: " + effectedPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
+
                 new FlagSpeciesFeature(megaType, true).apply(originalPokemon);
                 new FlagSpeciesFeature(megaType, true).apply(effectedPokemon);
+
+//                System.out.println("original pokemon after setting flagspeciesfeature: " + originalPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
+//                System.out.println("effectedPokemonJson after setting flagspeciesfeature: " + effectedPokemon.saveToJSON(DynamicRegistryManager.EMPTY, new JsonObject()));
+
+
                 ServerPlayerEntity player = battlePokemon.getOriginalPokemon().getOwnerPlayer();
                 if (player == null) return Unit.INSTANCE;
                 CobblemonMegas.getInstance().getHasMegaEvolvedThisBattle().add(player.getUuid());
@@ -59,5 +71,4 @@ public abstract class FormeChangeInstructionMixin {
             });
         }
     }
-
 }
