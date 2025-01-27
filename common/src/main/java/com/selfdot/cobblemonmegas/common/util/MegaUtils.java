@@ -20,10 +20,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static net.minecraft.component.DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE;
@@ -71,8 +68,8 @@ public class MegaUtils {
         if (playerBattleActor == null) return "PlayerBattleActor is null (Report this error)";
         List<ActiveBattlePokemon> activeBattlePokemon = playerBattleActor.getActivePokemon();
         if (activeBattlePokemon.size() != 1) return "Mega evolution is currently only available in 1v1 battles.";
-        BattlePokemon battlePokemon = activeBattlePokemon.get(0).getBattlePokemon();
-        if (battlePokemon == null) battlePokemon = playerBattleActor.getPokemonList().get(0);
+        BattlePokemon battlePokemon = activeBattlePokemon.getFirst().getBattlePokemon();
+        if (battlePokemon == null) battlePokemon = playerBattleActor.getPokemonList().getFirst();
 
         if (!battlePokemon.getEffectedPokemon().getUuid().equals(pokemon.getUuid())) {
             return "This is not your active battle Pokémon.";
@@ -100,7 +97,17 @@ public class MegaUtils {
         // Restore the original ability
         NbtCompound pokemonNbt = pokemon.getPersistentData();
         if (pokemonNbt.isEmpty() || !pokemonNbt.contains(DataKeys.NBT_KEY_PREVIOUS_ABILITY)) return;
-        restorePreviousAbility(pokemon);
+
+        Optional<Ability> previousAbility = getPreviousAbility(pokemon);
+        // if we didn't find the previousAbility, better not to do anything
+        if (previousAbility.isEmpty()) return;
+
+        pokemon.updateAbility(previousAbility.get());
+
+        if (!pokemon.getAbility().getName().equalsIgnoreCase(previousAbility.get().getName())) {
+            // only remove the nbt if the update was successful
+            NbtUtils.removePokemonNbtString(pokemon, DataKeys.NBT_KEY_PREVIOUS_ABILITY);
+        }
     }
 
     private static void sendError(ServerPlayerEntity player, String error) {
@@ -135,7 +142,7 @@ public class MegaUtils {
         if (playerBattleActor == null) return false;
         List<ActiveBattlePokemon> activeBattlePokemon = playerBattleActor.getActivePokemon();
         if (activeBattlePokemon.size() != 1) return false;
-        BattlePokemon battlePokemon = activeBattlePokemon.get(0).getBattlePokemon();
+        BattlePokemon battlePokemon = activeBattlePokemon.getFirst().getBattlePokemon();
         if (battlePokemon == null) return false;
         Pokemon pokemon = battlePokemon.getEffectedPokemon();
 
@@ -189,14 +196,6 @@ public class MegaUtils {
             .forEach(aspect -> new FlagSpeciesFeature(aspect, false).apply(pokemon));
     }
 
-    private static void restorePreviousAbility(Pokemon pokemon) {
-        Optional<Ability> previousAbility = getPreviousAbility(pokemon);
-        // if we didn't find the previousAbility, better not to do anything
-        if (previousAbility.isEmpty()) return;
-        pokemon.updateAbility(previousAbility.get());
-        NbtUtils.removePokemonNbtString(pokemon, DataKeys.NBT_KEY_PREVIOUS_ABILITY);
-    }
-
     /**
      * Retrieves a Pokémon's previous ability from its persistent data, species ability pool or the global Abilities registries.
      * If the previous ability is not stored in the Pokémon's persistent data, the method falls back to the first ability found from the species AbilityPool.
@@ -216,7 +215,7 @@ public class MegaUtils {
 
             for (PotentialAbility pa : speciesAbilities) {
                 // Return the first one we encounter
-                return Optional.of(pa.getTemplate().create(false, Priority.NORMAL));
+                return Optional.of(pa.getTemplate().create(false, pa.getPriority()));
             }
 
             // If speciesAbilities is empty for some reason
@@ -226,17 +225,11 @@ public class MegaUtils {
         }
 
         // Attempt to find the previous ability in the species ability pool
-        AbilityTemplate foundTemplate = null;
         for (PotentialAbility pa : speciesAbilities) {
             AbilityTemplate template = pa.getTemplate();
             if (template.getName().equalsIgnoreCase(previousAbilityName)) {
-                foundTemplate = template;
-                break;
+                return Optional.of(template.create(false, pa.getPriority()));
             }
-        }
-
-        if (foundTemplate != null) {
-            return Optional.of(foundTemplate.create(false, Priority.NORMAL));
         }
 
         // if we didn't find the ability in the species AbilityPool, something is sus, but we're going to set it anyway
@@ -245,8 +238,20 @@ public class MegaUtils {
         // check other mods or data packs that can be messing with species and/or pokémon abilities
         AbilityTemplate previousAbilityTemplate = Abilities.INSTANCE.get(previousAbilityName.toLowerCase());
         if (previousAbilityTemplate != null) {
-            log.warn("Ability '{}' was found in the Abilities registry, but not in the species AbilityPool for {}. Using it anyway.", previousAbilityName, pokemon.getDisplayName().getString());
-            return Optional.of(previousAbilityTemplate.create(false, Priority.NORMAL));
+            ServerPlayerEntity ownerPlayer = pokemon.getOwnerPlayer();
+            String ownerPlayerName = ownerPlayer == null ? "" : pokemon.getOwnerPlayer().getName().getString();
+            String ownerPlayerUuid = ownerPlayer == null ? "" : pokemon.getOwnerPlayer().getUuid().toString();
+            log.warn("Ability '{}' of Pokemon '{}' with UUID '{}' from owner '{}' with UUID '{}' was found in the Abilities registry, but not in the species '{}' AbilityPool. This is means that this ability will be set as forced and if the pokemons tries to change his ability in any other way, it will be ignored, including ability patches. Setting anyway...",
+                    previousAbilityName,
+                    pokemon.getDisplayName().getString(),
+                    pokemon.getSpecies().getName(),
+                    pokemon.getUuid(),
+                    ownerPlayerName,
+                    ownerPlayerUuid
+            );
+
+            // In this case, we are setting forced = true but even if we set forced = false, it will be ignored in Pokemon.attachAbilityCoordinate()
+            return Optional.of(previousAbilityTemplate.create(true, Priority.NORMAL));
         }
 
         // At this point, we failed to find the ability anywhere

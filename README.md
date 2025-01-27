@@ -1,3 +1,4 @@
+# CobblemonMegas
 This mod is server-side only, and adds game-accurate Mega Evolution battle mechanics to Cobblemon, as well as out-of-battle Mega Evolution.
 
 Mega stones are required for mega evolution, and can be set up with custom textures using a resource pack.
@@ -5,6 +6,15 @@ Mega stones are required for mega evolution, and can be set up with custom textu
 Clicking the mega evolve button in the move select screen, or right clicking with a key stone item can be used to mega evolve in battle.
 
 Mega form models for Pokémon can also be setup as described below.
+
+The plan for this fork is to upgrade the Fabric version to Cobblemon 1.6.0 and fix some bugs.
+
+This is a targeted effort to help the migration of our server to Cobblemon 1.6.0. We will discuss later if we will continue development or use Flourish. If we decide to drop the maintenance after the migration, I will archive the repo and notify accordingly.
+
+Issues will be review in a best-effort basis, contributions are welcome.
+
+Discord Support Channel: https://discord.com/channels/934267676354834442/1328350851747807326
+
 
 Commands:
 
@@ -48,7 +58,3 @@ Resource Packs:
 For custom mega stone textures, you can use this resource pack: https://www.curseforge.com/minecraft/texture-packs/sanjimegastones
 
 To add models for mega-form pokémon, the model resolver must add the "mega" aspect (or "mega-x" or "mega-y" for Charizard and Mewtwo).
-
-Graphics by twsparklecat
-
-[![image](https://media.forgecdn.net/attachments/description/959503/description_ec38fa43-4312-4aea-b11d-849dbdd062b1.png)](https://discord.gg/y8K2HYDBuX)

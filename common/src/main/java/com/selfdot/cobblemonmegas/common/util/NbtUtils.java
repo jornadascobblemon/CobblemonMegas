@@ -2,6 +2,7 @@ package com.selfdot.cobblemonmegas.common.util;
 
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import lombok.extern.slf4j.Slf4j;
+import net.minecraft.component.type.CustomModelDataComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -11,8 +12,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
-import static net.minecraft.component.DataComponentTypes.CUSTOM_DATA;
-import static net.minecraft.component.DataComponentTypes.ITEM_NAME;
+import static net.minecraft.component.DataComponentTypes.*;
 
 @Slf4j
 public class NbtUtils {
@@ -196,4 +196,15 @@ public class NbtUtils {
         // we have to emit to update the persistent data
         pokemon.getAnyChangeObservable().emit();
     }
+
+    /**
+     * Sets an integer value in the custom model data of the given ItemStack.
+     *
+     * @param itemStack The ItemStack to modify.
+     * @param value     The integer value to assign.
+     */
+    public static void setCustomModelData(@NotNull ItemStack itemStack, @NotNull Integer value) {
+        itemStack.apply(CUSTOM_MODEL_DATA, CustomModelDataComponent.DEFAULT, current -> new CustomModelDataComponent(value));
+    }
+
 }
